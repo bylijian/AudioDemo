@@ -15,11 +15,22 @@ android {
                 cppFlags "-frtti -fexceptions"
             }
         }
+        //我们编译的FFmpeg so 是armeabi平台，不支持其他平台，添加这个标签~
+        ndk {
+            abiFilters 'armeabi'
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    //必须指定so库的目录，gradle生成Apk的时候，才能把对应的so库打包进去~
+    sourceSets {
+        main {
+            // let gradle pack the shared library into apk
+            jniLibs.srcDirs = ['/src/main/jniLibs']
         }
     }
     externalNativeBuild {
