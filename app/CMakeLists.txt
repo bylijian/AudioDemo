@@ -10,6 +10,56 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+###########################################################################
+
+# 配置导入的FFmpeg so库路径
+set(FFmpeg_DIR  ${CMAKE_SOURCE_DIR}/src/main/jniLibs )
+
+# 配置so库对应的头文件路径
+include_directories(
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/include
+)
+
+
+# ${ANDROID_ABI} 这个参数用于表示当前编译的平台比如 arm ，arm-v7a，x86等
+# add_library 添加一个library
+# set_target_properties 设置目标的属性
+add_library(lib_avcodec SHARED IMPORTED)
+set_target_properties(lib_avcodec PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libavcodec-57.so)
+
+add_library(lib_avdevice SHARED IMPORTED)
+set_target_properties(lib_avdevice PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libavdevice-57.so)
+
+add_library(lib_avfilter SHARED IMPORTED)
+set_target_properties(lib_avfilter PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libavfilter-6.so)
+
+add_library(lib_avformat SHARED IMPORTED)
+set_target_properties(lib_avformat PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libavformat-57.so)
+
+add_library(lib_avutil SHARED IMPORTED)
+set_target_properties(lib_avutil PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libavutil-55.so)
+
+add_library(lib_postproc SHARED IMPORTED)
+set_target_properties(lib_postproc PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libpostproc-54.so)
+
+add_library(lib_swresample SHARED IMPORTED)
+set_target_properties(lib_swresample PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libswresample-2.so)
+
+add_library(lib_swscale SHARED IMPORTED)
+set_target_properties(lib_swscale PROPERTIES IMPORTED_LOCATION
+    ${FFmpeg_DIR}/${ANDROID_ABI}/libswscale-4.so)
+
+
+############################################################################
+
+# 这是Cmake编译 native-audio 的代码
 add_library( # Sets the name of the library.
              native-audio
 
@@ -25,6 +75,7 @@ add_library( # Sets the name of the library.
 # you want to add. CMake verifies that the library exists before
 # completing its build.
 
+# 搜索 log 系统已经编译好的库，并且 把它的路径指定为一个 variable
 find_library( # Sets the name of the path variable.
               log-lib
 
@@ -42,3 +93,36 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+
+##################################################################################
+
+# 这是使用 Cmake 编译测试 FFmpeg 的代码
+add_library( # Sets the name of the library.
+             ffmpeg-test
+
+             # Sets the library as a shared library.
+             SHARED
+
+             # Provides a relative path to your source file(s).
+             src/main/cpp/test.c )
+
+target_link_libraries( # Specifies the target library.
+                       ffmpeg-test
+
+                       # Links the target library to the log library
+                       # included in the NDK.
+                       ${log-lib}
+
+                        # Links the target library to the FFmpeglibrary
+                        # included in the NDK.
+                        lib_avcodec
+                        lib_avdevice
+                        lib_avfilter
+                        lib_avformat
+                        lib_avutil
+                        lib_postproc
+                        lib_swresample
+                        lib_swscale
+                        )
+
+##################################################################################

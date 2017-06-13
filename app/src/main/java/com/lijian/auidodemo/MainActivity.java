@@ -5,13 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "MainActivity";
 
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-audio");
+        System.loadLibrary("ffmpeg-test");//Fmpeg的调用测试
     }
 
     private Button mPlayButton;
@@ -26,9 +27,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initViews() {
-        mPauseButton= (Button) findViewById(R.id.pause);
-        mPlayButton= (Button) findViewById(R.id.play);
-        mStopButton= (Button) findViewById(R.id.stop);
+        mPauseButton = (Button) findViewById(R.id.pause);
+        mPlayButton = (Button) findViewById(R.id.play);
+        mStopButton = (Button) findViewById(R.id.stop);
         mPauseButton.setOnClickListener(this);
         mPlayButton.setOnClickListener(this);
         mStopButton.setOnClickListener(this);
@@ -37,8 +38,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.play:
+                testFFmpeg();//Fmpeg测试调用函数
                 nativePlay("123.mp3");
                 break;
             case R.id.pause:
@@ -67,5 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * which is packaged with this application.
      */
     public native boolean nativePause();
+
+    /**
+     * A native method that is implemented by the 'audio-player' native library,
+     * which is packaged with this application.
+     */
+    public native boolean testFFmpeg();
+
 
 }
